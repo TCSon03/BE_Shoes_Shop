@@ -1,7 +1,7 @@
 import express from "express";
 import router from "./src/routers/index.js";
-import connectDB from "./src/configs/db.js";
-import { PORT } from "./src/configs/enviroments.js";
+import connectDB from "./src/common/configs/db.js";
+import { PORT } from "./src/common/configs/enviroments.js";
 
 connectDB();
 
