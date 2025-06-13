@@ -1,52 +1,35 @@
-import Category from "../models/Category.js";
-import handleAsync from "../utils/handleAsync.js";
-import createReponse from "../utils/reponse.js";
-import { categorySchema } from "../validators/category.js";
+import handleAsync from "../../common/utils/handleAsync.js";
+import { categorySchema } from "./category.validation.js";
+import createReponse from "./../../common/utils/reponse.js";
+import Category from "./category.model.js";
+import findByIdCategory from "./category.service.js";
 
 export const createCategory = handleAsync(async (req, res, next) => {
-  const { error } = categorySchema.validate(req.body);
-  if (error) {
-    return next(createError(400, error.details[0].message));
+  const existingCategory = await Category.findOne({ title: req.body.title });
+  if (existingCategory) {
+    return next(createError(400, "Category with this title already exists"));
   }
   const data = await Category.create(req.body);
-  console.log("Category created:", data);
-  if (data) {
-    return res.json(
-      createReponse(true, 201, "Category created successfully", data)
-    );
-  }
-
-  next(createError(400, "Category creation failed"));
+  return res.json(
+    createReponse(true, 201, "Category created successfully", data)
+  );
 });
 
 export const getAllCategory = handleAsync(async (req, res, next) => {
-  const categories = await Category.find();
-  console.log("Categories retrieved:", categories);
-  if (categories) {
-    return res.json(
-      createReponse(true, 200, "Categories retrieved successfully", categories)
-    );
-  }
-
-  next(createError(404, "No categories found"));
+  const data = await Category.find();
+  return res.json(
+    createReponse(true, 200, "Categories retrieved successfully", data)
+  );
 });
 
 export const getDetailCategory = handleAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await Category.findById(id);
-  console.log("Category details retrieved:", category);
-  if (category) {
-    return res.json(
-      createReponse(
-        true,
-        200,
-        "Category details retrieved successfully",
-        category
-      )
-    );
+  const data = await findByIdCategory(req.params.id);
+  if(!data) {
+    return next(createError(404, "Category not found"));
   }
-
-  next(createError(404, "Category not found"));
+  return res.json(
+    createReponse(true, 200, "Category details retrieved successfully", data)
+  );
 });
 
 export const updateCategory = handleAsync(async (req, res, next) => {

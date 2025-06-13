@@ -7,16 +7,21 @@ import {
   restoreCategory,
   sortDeleteCategory,
   updateCategory,
-} from "../controllers/categoryController.js";
+} from "./category.controller.js";
+import validBodyRequest from "../../common/middlewares/validBodyRequest.js";
+import { categorySchema } from "./category.validation.js";
 
 const categoryRoutes = Router();
 
-categoryRoutes.post("/", createCategory);
 categoryRoutes.get("/", getAllCategory);
+
 categoryRoutes.get("/:id", getDetailCategory);
-categoryRoutes.patch("/:id", updateCategory);
 categoryRoutes.delete("/:id", deleteCategory);
 categoryRoutes.delete("/sort-delete/:id", sortDeleteCategory);
 categoryRoutes.patch("/restore/:id", restoreCategory);
+
+categoryRoutes.use(validBodyRequest(categorySchema))
+categoryRoutes.post("/", createCategory);
+categoryRoutes.patch("/:id", updateCategory);
 
 export default categoryRoutes;

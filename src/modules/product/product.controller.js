@@ -1,6 +1,6 @@
-import Product from "../models/Product.js";
-import handleAsync from "../utils/handleAsync.js";
-import { productSchema } from "../validators/product.js";
+import Product from "./product.model.js";
+import handleAsync from './../../common/utils/handleAsync.js';
+import { productSchema } from './product.validation.js';
 
 export const getListProduct = handleAsync(async (req, res, next) => {
   const products = await Product.find();
