@@ -1,15 +1,20 @@
 import handleAsync from "../../common/utils/handleAsync.js";
 import { categorySchema } from "./category.validation.js";
 import createReponse from "./../../common/utils/reponse.js";
-import Category from "./category.model.js";
 import findByIdCategory from "./category.service.js";
+import Category from "./category.model.js";
 
 export const createCategory = handleAsync(async (req, res, next) => {
-  const existingCategory = await Category.findOne({ title: req.body.title });
+  console.log("Creating category with data:", req.data);
+  
+
+  const { title } = req.data;
+
+  const existingCategory = await Category.findOne({ title });
   if (existingCategory) {
     return next(createError(400, "Category with this title already exists"));
   }
-  const data = await Category.create(req.body);
+  const data = await Category.create(req.data);
   return res.json(
     createReponse(true, 201, "Category created successfully", data)
   );
@@ -24,7 +29,7 @@ export const getAllCategory = handleAsync(async (req, res, next) => {
 
 export const getDetailCategory = handleAsync(async (req, res, next) => {
   const data = await findByIdCategory(req.params.id);
-  if(!data) {
+  if (!data) {
     return next(createError(404, "Category not found"));
   }
   return res.json(
