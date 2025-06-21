@@ -5,16 +5,9 @@ import findByIdCategory from "./category.service.js";
 import Category from "./category.model.js";
 
 export const createCategory = handleAsync(async (req, res, next) => {
-  console.log("Creating category with data:", req.data);
-  
-
-  const { title } = req.data;
-
-  const existingCategory = await Category.findOne({ title });
-  if (existingCategory) {
-    return next(createError(400, "Category with this title already exists"));
-  }
-  const data = await Category.create(req.data);
+  const existing = await Category.findOne({ title: req.body.title });
+  if (existing) return next(createError(400, "Category already exists"));
+  const data = await Category.create(req.body);
   return res.json(
     createReponse(true, 201, "Category created successfully", data)
   );
@@ -38,20 +31,12 @@ export const getDetailCategory = handleAsync(async (req, res, next) => {
 });
 
 export const updateCategory = handleAsync(async (req, res, next) => {
-  const { error } = categorySchema.validate(req.body);
-  if (error) {
-    return next(createError(400, error.details[0].message));
-  }
-  const { id } = req.params;
-  if (id) {
-    const updatedCategory = await Category.findByIdAndUpdate(id, req.body);
-    console.log("Category updated:", updatedCategory);
+  const data = await Category.findByIdAndUpdate(req.params.id, req.body);
+  if (data)
     return res.json(
-      createReponse(true, 200, "Category updated successfully", updatedCategory)
+      createReponse(true, 200, "Category updated successfully", data)
     );
-  }
-
-  next(createError(404, "Category not found"));
+  next(createError(false, 404, "Category update failed!"));
 });
 
 export const deleteCategory = handleAsync(async (req, res, next) => {
