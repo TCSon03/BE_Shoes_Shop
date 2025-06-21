@@ -1,16 +1,29 @@
 import express from "express";
 import router from "./src/routers/index.js";
-import connectDB from "./src/configs/db.js";
-import { PORT } from "./src/configs/enviroments.js";
-
-connectDB();
+import connectDB from "./src/common/configs/db.js";
+import { PORT, HOST } from "./src/common/configs/enviroments.js";
+import setupSwagger from "./src/common/configs/swagger-config.js";
 
 const app = express();
 
-app.use(express.json());
+async function startServer() {
+  try {
+    await connectDB();
+    console.log("mongoDB connected successfully");
 
-app.use("/api", router);
+    app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
+    app.use("/api", router);
+
+    setupSwagger(app);
+
+    app.listen(PORT, HOST, () => {
+      console.log(`Server is running on: http://${HOST}:${PORT}/api`);
+      console.log(`Swagger Docs available at http://${HOST}:${PORT}/api-docs`);
+    });
+  } catch (error) {
+    console.error("Database connection failed:", error);
+    process.exit(1); // Exit the process with failure
+  }
+}
+startServer();
