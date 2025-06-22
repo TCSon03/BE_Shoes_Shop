@@ -4,6 +4,7 @@ import connectDB from "./src/common/configs/db.js";
 import { PORT, HOST } from "./src/common/configs/enviroments.js";
 import setupSwagger from "./src/common/configs/swagger-config.js";
 import cors from "cors";
+import errorHandler from "./src/common/middlewares/errorHandler.js";
 
 const app = express();
 
@@ -21,6 +22,8 @@ async function startServer() {
     app.use(express.json());
     app.use("/api", router);
     setupSwagger(app);
+
+    app.use(errorHandler)
 
     app.listen(PORT, () => {
       console.log(`Server is running on: http://localhost:${PORT}/api`);

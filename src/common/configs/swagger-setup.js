@@ -1,7 +1,7 @@
 import swaggerAutogen from "swagger-autogen";
 import { HOST, PORT } from "./enviroments.js";
 
-swaggerAutogen();
+const swaggerAutogenInstance = swaggerAutogen({ autoBody: true });
 
 const outputFile = "./src/common/configs/swagger-output.json";
 const endpointsFiles = ["./src/routers/index.js"]; // chỉnh sửa theo đường dẫn đến file chứa các endpoint của bạn
@@ -27,4 +27,4 @@ const swaggerConfig = {
 	},
 };
 
-swaggerAutogen()(outputFile, endpointsFiles, swaggerConfig);
+swaggerAutogenInstance(outputFile, endpointsFiles, swaggerConfig);

@@ -25,6 +25,7 @@ const MESSAGES = {
 		INVALID_EMAIL: "Email không hợp lệ",
 		INVALID_PASSWORD: "Mật khẩu không hợp lệ",
 		AUTH_ACCOUNT_INACTIVE: "Tài khoản của bạn chưa được kích hoạt hoặc đã bị vô hiệu hóa",
+		USER_NOT_FOUND: "Thông tin người dùng không chính xác",
 	},
 	USER: {
 		GET_SUCCESS: "Lấy danh sách người dùng thành công",
