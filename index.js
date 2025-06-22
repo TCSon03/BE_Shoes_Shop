@@ -22,9 +22,9 @@ async function startServer() {
     app.use("/api", router);
     setupSwagger(app);
 
-    app.listen(PORT, HOST, () => {
-      console.log(`Server is running on: http://${HOST}:${PORT}/api`);
-      console.log(`Swagger Docs available at http://${HOST}:${PORT}/api-docs`);
+    app.listen(PORT, () => {
+      console.log(`Server is running on: http://localhost:${PORT}/api`);
+      console.log(`Swagger Docs available at http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
     console.error("Database connection failed:", error);
