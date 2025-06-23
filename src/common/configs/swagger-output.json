@@ -25,6 +25,19 @@
     "application/json"
   ],
   "paths": {
+    "/upload/logo": {
+      "post": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "description": "",
@@ -98,6 +111,15 @@
               "type": "object",
               "properties": {
                 "title": {
+                  "example": "any"
+                },
+                "logoCategory": {
+                  "example": "any"
+                },
+                "descriptionCategory": {
+                  "example": "any"
+                },
+                "slugCategory": {
                   "example": "any"
                 }
               }

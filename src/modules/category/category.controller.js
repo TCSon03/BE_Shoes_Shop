@@ -1,15 +1,31 @@
 import handleAsync from "../../common/utils/handleAsync.js";
-import { categorySchema } from "./category.validation.js";
 import createReponse from "./../../common/utils/reponse.js";
 import findByIdCategory from "./category.service.js";
 import Category from "./category.model.js";
 
 export const createCategory = handleAsync(async (req, res, next) => {
-  const existing = await Category.findOne({ title: req.body.title });
-  if (existing) return next(createError(400, "Category already exists"));
-  const data = await Category.create(req.body);
+  const { title, logoCategory, descriptionCategory, slugCategory } = req.body;
+  const existingCategory = await Category.findOne({
+    $or: [{ title }, { slugCategory }],
+  });
+
+  if (existingCategory) {
+    if (existingCategory.title === title) {
+      return next(createError(400, "Tiêu đề danh mục đã tồn tại"));
+    }
+    if (existingCategory.slugCategory === slugCategory) {
+      return next(createError(400, "Slug danh mục đã tồn tại"));
+    }
+  }
+
+  const newCategory = await Category.create({
+    ...req.body,
+  });
+  if (!newCategory) {
+    return next(createError(500, "Tạo danh mục thất bại"));
+  }
   return res.json(
-    createReponse(true, 201, "Category created successfully", data)
+    createReponse(true, 201, "Danh mục được tạo thành công", newCategory)
   );
 });
 

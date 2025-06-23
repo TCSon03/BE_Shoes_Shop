@@ -4,21 +4,33 @@ const categorySchema = new Schema(
   {
     title: {
       type: String,
-      unique: true, //unique title chỉ có một cái title duy nhất
-      required: true, // bắt buộc phải có title
+      required: true,
+      unique: true, // tên danh mục phải duy nhất
     },
-    description: {
+    logoCategory: {
       type: String,
-      required: true, // bắt buộc phải có description
+      default: "", // URL ảnh logo
     },
-    slug: {
+    descriptionCategory: {
       type: String,
-      unique: true, //unique slug chỉ có một cái slug duy nhất
-      required: true, // bắt buộc phải có slug
+      default: "",
+    },
+    slugCategory: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true, // true: hoạt động
+    },
+    position: {
+      type: Number,
+      default: 0, // vị trí sắp xếp
     },
     deletedAt: {
       type: Date,
-      default: null, // mặc định là true
+      default: null, // để xử lý soft delete
     },
   },
   {

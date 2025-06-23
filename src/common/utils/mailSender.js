@@ -1,4 +1,4 @@
-import { EMAIL_PASSWORD } from "../configs/enviroments.js";
+import { EMAIL_USER,EMAIL_PASSWORD } from "../configs/enviroments.js";
 import createError from "./error.js";
 import nodemailer from "nodemailer";
 
@@ -6,7 +6,7 @@ const sendEmail = async (email, subject, text) => {
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: "truongcongsson@gmail.com",
+            user: EMAIL_USER,
             pass: EMAIL_PASSWORD
         }
     });
