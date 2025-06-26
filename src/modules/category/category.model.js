@@ -3,40 +3,36 @@ import mongoose, { Schema } from "mongoose";
 const categorySchema = new Schema(
   {
     title: {
-      type: String,
+      type: String, // Tiêu đề danh mục (ví dụ: Giày, Dép...)
       required: true,
-      unique: true, // tên danh mục phải duy nhất
     },
     logoCategory: {
-      type: String,
-      default: "", // URL ảnh logo
-    },
-    descriptionCategory: {
-      type: String,
+      type: String, // URL hình ảnh logo của danh mục
       default: "",
     },
-    slugCategory: {
-      type: String,
-      required: true,
+    descriptionCate: {
+      type: String, // Mô tả thêm cho danh mục
+      default: "",
+    },
+    slugCate: {
+      type: String, // Slug dùng cho URL, duy nhất và không được để trống
       unique: true,
+      required: true,
     },
     isActive: {
-      type: Boolean,
-      default: true, // true: hoạt động
+      type: Boolean, // Trạng thái hiển thị (true: còn hoạt động, false: đã ẩn)
+      default: true,
     },
     position: {
-      type: Number,
-      default: 0, // vị trí sắp xếp
+      type: String, // Vị trí hiển thị trong danh sách
+      default: 0,
     },
-    deletedAt: {
-      type: Date,
-      default: null, // để xử lý soft delete
+    deletetAt: {
+      type: Date, // Trường dùng cho xóa mềm (soft delete)
+      default: null,
     },
   },
-  {
-    versionKey: false, // không sử dụng __v
-    timestamps: true, // tự động thêm createdAt và updatedAt
-  }
+  { versionKey: false, timestamps: true }
 );
 
 export default mongoose.model("Category", categorySchema);

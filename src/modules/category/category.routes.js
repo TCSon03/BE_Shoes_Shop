@@ -2,18 +2,20 @@ import { Router } from "express";
 import {
   createCategory,
   deleteCategory,
-  getAllCategory,
+  getAllCategoryByAdmin,
+  getAllCategoryByClient,
   getDetailCategory,
   restoreCategory,
   sortDeleteCategory,
   updateCategory,
 } from "./category.controller.js";
 import { categorySchema } from "./category.validation.js";
-import validBodyRequest from './../../common/middlewares/validBodyRequest.js';
+import validBodyRequest from "./../../common/middlewares/validBodyRequest.js";
 
 const categoryRoutes = Router();
 
-categoryRoutes.get("/", getAllCategory);
+categoryRoutes.get("/get-client", getAllCategoryByClient);
+categoryRoutes.get("/get-admin", getAllCategoryByAdmin);
 
 categoryRoutes.get("/:id", getDetailCategory);
 categoryRoutes.delete("/:id", deleteCategory);

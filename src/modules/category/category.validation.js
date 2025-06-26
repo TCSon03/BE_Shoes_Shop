@@ -3,21 +3,28 @@ import { z } from "zod";
 export const categorySchema = z.object({
   title: z
     .string()
-    .min(3, "Tiêu đề không được để trống")
-    .max(100, "Tiêu đề không được quá 100 ký tự"),
-  logoCategory: z.string().url("URL ảnh logo không hợp lệ").optional(),
+    .min(3, "Tên danh mục phải có ít nhất 3 ký tự")
+    .max(100, "Tên danh mục không vượt quá 100 ký tự"),
+
+  logoCategory: z
+    .string()
+    .url("Logo phải là một URL hợp lệ")
+    .optional()
+    .or(z.literal("")), // Cho phép rỗng
+
   descriptionCategory: z
     .string()
-    .max(500, "Mô tả không được quá 500 ký tự")
-    .optional(),
-  slugCategory: z
-    .string()
-    .min(3, "Slug không được để trống")
-    .max(100, "Slug không được quá 100 ký tự"),
-  isActive: z.boolean().optional(),
+    .max(1000, "Mô tả không vượt quá 1000 ký tự")
+    .optional()
+    .or(z.literal("")),
+
+  slugCate: z.string().min(1, "Slug phải có ít nhất 1 ký tự").optional(),
+
   position: z
     .number()
-    .int()
-    .min(0, "Vị trí phải là số nguyên không âm")
+    .int("Vị trí phải là số nguyên")
+    .min(0, "Thứ tự không được âm")
     .optional(),
+
+  isActive: z.boolean().optional(),
 });
