@@ -1,24 +1,24 @@
 import { z } from "zod";
 
-export const categoryValidation = z.object({
+export const brandValidation = z.object({
   title: z
     .string()
     .min(3, "Tên danh mục phải có ít nhất 3 ký tự")
     .max(100, "Tên danh mục không vượt quá 100 ký tự"),
 
-  logoCategory: z
+  logoBrand: z
     .string()
     .url("Logo phải là một URL hợp lệ")
     .optional()
     .or(z.literal("")), // Cho phép rỗng
 
-  descriptionCategory: z
+  descriptionBrand: z
     .string()
     .max(1000, "Mô tả không vượt quá 1000 ký tự")
     .optional()
     .or(z.literal("")),
 
-  slugCate: z.string().min(1, "Slug phải có ít nhất 1 ký tự").optional(),
+  slugBrand: z.string().min(1, "Slug phải có ít nhất 1 ký tự").optional(),
 
   position: z
     .number()

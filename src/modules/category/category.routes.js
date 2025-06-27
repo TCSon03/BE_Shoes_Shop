@@ -9,7 +9,7 @@ import {
   sortDeleteCategory,
   updateCategory,
 } from "./category.controller.js";
-import { categorySchema } from "./category.validation.js";
+import { categoryValidation } from "./category.validation.js";
 import validBodyRequest from "./../../common/middlewares/validBodyRequest.js";
 
 const categoryRoutes = Router();
@@ -22,7 +22,11 @@ categoryRoutes.delete("/:id", deleteCategory);
 categoryRoutes.delete("/sort-delete/:id", sortDeleteCategory);
 categoryRoutes.patch("/restore/:id", restoreCategory);
 
-categoryRoutes.post("/", validBodyRequest(categorySchema), createCategory);
-categoryRoutes.patch("/:id", validBodyRequest(categorySchema), updateCategory);
+categoryRoutes.post("/", validBodyRequest(categoryValidation), createCategory);
+categoryRoutes.patch(
+  "/:id",
+  validBodyRequest(categoryValidation),
+  updateCategory
+);
 
 export default categoryRoutes;

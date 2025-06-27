@@ -147,7 +147,7 @@ export const sortDeleteCategory = handleAsync(async (req, res, next) => {
     return next(createError(400, "Id không hợp lệ"));
   }
   const data = await Category.findByIdAndUpdate(id, {
-    deletetAt: new Date(),
+    deletedAt: new Date(),
     isActive: false,
   });
   if (!data) {
@@ -162,7 +162,7 @@ export const restoreCategory = handleAsync(async (req, res, next) => {
     return next(createError(400, "Id không hợp lệ"));
   }
   const data = await Category.findByIdAndUpdate(id, {
-    deletetAt: null,
+    deletedAt: null,
     isActive: true,
   });
   if (!data) {
