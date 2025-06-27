@@ -5,6 +5,7 @@ import uploadRouter from "../modules/upload/upload.routes.js";
 import attributeRoutes from "../modules/attribute/attribute.routes.js";
 import subCategoryRoutes from "../modules/subCategory/subCategory.routes.js";
 import brandRoutes from "../modules/brand/brand.routes.js";
+import productRoutes from "../modules/product/product.routes.js";
 
 const router = Router();
 
@@ -13,9 +14,13 @@ router.use("/upload", uploadRouter);
 router.use("/auth", authRoutes);
 
 router.use("/categories", categoryRoutes);
+
 router.use("/sub-cate", subCategoryRoutes);
+
 router.use("/brand", brandRoutes);
 
 router.use("/attribute", attributeRoutes);
+
+router.use("/products", productRoutes);
 
 export default router;
