@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const categorySchema = new Schema(
+const subCategorySchema = new Schema(
   {
     title: {
       type: String, // Tiêu đề danh mục (ví dụ: Giày, Dép...)
@@ -14,7 +14,7 @@ const categorySchema = new Schema(
       type: String, // Mô tả thêm cho danh mục
       default: "",
     },
-    slugCate: {
+    slugSubCate: {
       type: String, // Slug dùng cho URL, duy nhất và không được để trống
       unique: true,
       required: true,
@@ -31,8 +31,13 @@ const categorySchema = new Schema(
       type: Date, // Trường dùng cho xóa mềm (soft delete)
       default: null,
     },
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
   },
   { versionKey: false, timestamps: true }
 );
 
-export default mongoose.model("Category", categorySchema);
+export default mongoose.model("SubCategory", subCategorySchema);
