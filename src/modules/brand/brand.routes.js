@@ -12,17 +12,17 @@ import {
 } from "./brand.controller.js";
 import validBodyRequest from "../../common/middlewares/validBodyRequest.js";
 
-const categoryRoutes = Router();
+const brandRoutes = Router();
 
-categoryRoutes.get("/get-client", getAllBrandByClient);
-categoryRoutes.get("/get-admin", getAllBrandByAdmin);
+brandRoutes.get("/get-client", getAllBrandByClient);
+brandRoutes.get("/get-admin", getAllBrandByAdmin);
 
-categoryRoutes.get("/:id", getDetailBrand);
-categoryRoutes.delete("/:id", deleteBrand);
-categoryRoutes.delete("/sort-delete/:id", sortDeleteBrand);
-categoryRoutes.patch("/restore/:id", restoreBrand);
+brandRoutes.get("/:id", getDetailBrand);
+brandRoutes.delete("/:id", deleteBrand);
+brandRoutes.delete("/sort-delete/:id", sortDeleteBrand);
+brandRoutes.patch("/restore/:id", restoreBrand);
 
-categoryRoutes.post("/", validBodyRequest(brandValidation), createBrand);
-categoryRoutes.patch("/:id", validBodyRequest(brandValidation), updateBrand);
+brandRoutes.post("/", validBodyRequest(brandValidation), createBrand);
+brandRoutes.patch("/:id", validBodyRequest(brandValidation), updateBrand);
 
-export default categoryRoutes;
+export default brandRoutes;

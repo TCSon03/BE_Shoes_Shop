@@ -35,4 +35,4 @@ const brandSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-export default mongoose.model("Category", brandSchema);
+export default mongoose.model("Brand", brandSchema);
