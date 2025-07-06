@@ -1,5 +1,3 @@
-
-
 import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema(
@@ -33,7 +31,6 @@ const userSchema = new Schema(
   },
   {
     timestamps: true,
-    versionKey: false,
   }
 );
 
