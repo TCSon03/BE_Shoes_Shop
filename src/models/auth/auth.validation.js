@@ -36,6 +36,7 @@ export const registerValidation = Joi.object({
     district: Joi.string().allow("").optional(),
     city: Joi.string().allow("").optional(),
   }).optional(),
+  
   avatar: Joi.string().uri().optional().messages({
     "string.uri": "Avatar phải là một đường dẫn hợp lệ",
   }),
