@@ -125,6 +125,18 @@ export const deleteBrand = async (req, res) => {
         message: "Id không hợp lệ",
       });
     }
+
+    const brandDelete = await Brand.findOne({
+      _id: id,
+      deletedAt: { $ne: null },
+    });
+    if (!brandDelete) {
+      return res.status(404).json({
+        success: false,
+        message: "Brand không tồn tại hoặc chưa bị xóa mềm",
+      });
+    }
+
     const data = await Brand.findByIdAndDelete(id);
     if (!data) {
       return res.status(404).json({
@@ -138,6 +150,88 @@ export const deleteBrand = async (req, res) => {
       .json({ success: true, message: "Xóa Brand thành công" });
   } catch (error) {
     console.error("Lỗi xóa Brand", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+      error: error.message,
+    });
+  }
+};
+
+export const sortDeleteBrand = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Id Brand không hợp lệ",
+      });
+    }
+
+    const brandToDelete = await Brand.findOne({ _id: id, deletedAt: null });
+    if (!brandToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: "Brand không tồn tại hoặc đã bị xóa mềm",
+      });
+    }
+
+    const sortBrand = await Brand.findByIdAndUpdate(
+      id,
+      {
+        deletedAt: new Date(),
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Xóa mềm Brand thành công",
+      brand: sortBrand,
+    });
+  } catch (error) {
+    console.error("Lỗi xóa mềm: ", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+      error: error.message,
+    });
+  }
+};
+
+export const restoreBrand = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        message: "Id Brand không hợp lệ",
+      });
+    }
+
+    const brandToHardDelete = await Brand.findOne({
+      _id: id,
+      deletedAt: { $ne: null },
+    });
+    if (!brandToHardDelete) {
+      return res.status(404).json({
+        success: false,
+        message: "Brand không tồn tại hoặc chưa xóa mềm",
+      });
+    }
+
+    const restoreBrand = await Brand.findByIdAndUpdate(
+      id,
+      { deletedAt: null },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Khôi phục Brand thành công",
+      brand: restoreBrand,
+    });
+  } catch (error) {
+    console.error("Lỗi khôi phục Brand:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
