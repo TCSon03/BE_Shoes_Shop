@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
       default: "member",
     },
 
-    status: { type: Boolean, default: false },
+    status: { type: Boolean, default: true },
 
     lastLogin: {
       type: Date,

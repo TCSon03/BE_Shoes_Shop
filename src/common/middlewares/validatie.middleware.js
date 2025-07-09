@@ -1,11 +1,17 @@
 const validation = (schema) => (req, res, next) => {
   try {
-    const { error, value } = schema.validate(req.body, { abortEarly: false });
+    const { error, value } = schema.validate(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
+    });
     if (error) {
-      const errorMessage = error.details[0].message; // Lấy thông báo lỗi đầu tiên
-      return res.status(400).json({ "Valid body request": errorMessage });
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map((e) => e.message),
+      });
     }
-    req.data = value; // Lưu dữ liệu đã xác thực
+    req.body = value; // Lưu dữ liệu đã xác thực
     next();
   } catch (err) {
     console.error("Lỗi trong middleware validation:", err);
