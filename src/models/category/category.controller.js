@@ -1,31 +1,31 @@
 import mongoose from "mongoose";
-import Brand from "./brand.model.js";
+import Category from "./category.model.js";
 
-export const createBrand = async (req, res) => {
+export const createCategory = async (req, res) => {
   try {
     const { name, slug } = req.body;
 
-    const existingName = await Brand.findOne({ name });
+    const existingName = await Category.findOne({ name });
     if (existingName) {
       return res.status(404).json({
         message: "Name đã tồn tại",
       });
     }
 
-    const existingSlug = await Brand.findOne({ slug });
+    const existingSlug = await Category.findOne({ slug });
     if (existingSlug) {
       return res.status(400).json({ message: "Slug đã tồn tại" });
     }
 
-    const newBrand = await Brand.create(req.body);
+    const newCategory = await Category.create(req.body);
 
     return res.status(201).json({
       success: true,
-      message: "Tạo Brand thành công",
-      brand: newBrand,
+      message: "Tạo Category thành công",
+      category: newCategory,
     });
   } catch (error) {
-    console.error("Lỗi tạo Brand:", error);
+    console.error("Lỗi tạo Category:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
@@ -34,13 +34,13 @@ export const createBrand = async (req, res) => {
   }
 };
 
-export const getAllBrand = async (req, res) => {
+export const getAllCategory = async (req, res) => {
   try {
-    const data = await Brand.find({ deletedAt: null });
+    const data = await Category.find({ deletedAt: null });
 
     return res.status(200).json({
       success: true,
-      message: "Lấy danh sách Brand thành công",
+      message: "Lấy danh sách Category thành công",
       data,
     });
   } catch (error) {
@@ -53,7 +53,7 @@ export const getAllBrand = async (req, res) => {
   }
 };
 
-export const getBrandById = async (req, res) => {
+export const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id || id.length !== 24) {
@@ -63,19 +63,19 @@ export const getBrandById = async (req, res) => {
       });
     }
 
-    const data = await Brand.findById(id);
+    const data = await Category.findById(id);
     if (!data) {
       return res.status(400).json({
-        message: "Brand không tồn tại",
+        message: "Category không tồn tại",
       });
     }
     return res.status(200).json({
       success: true,
-      message: "Lấy chi tiết Brand thành công",
+      message: "Lấy chi tiết Category thành công",
       data,
     });
   } catch (error) {
-    console.error("Lỗi lấy chi tiết Brand", error);
+    console.error("Lỗi lấy chi tiết Category", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
@@ -84,7 +84,7 @@ export const getBrandById = async (req, res) => {
   }
 };
 
-export const updateBrand = async (req, res) => {
+export const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id || id.length !== 24) {
@@ -93,22 +93,24 @@ export const updateBrand = async (req, res) => {
         message: "ID không hợp lệ",
       });
     }
-    const brand = await Brand.findOne({ _id: id, deletedAt: null });
-    if (!brand) {
+    const category = await Category.findOne({ _id: id, deletedAt: null });
+    if (!category) {
       return res.status(404).json({
         success: false,
-        message: "Brand không tồn tại hoặc đã bị xóa",
+        message: "Category không tồn tại hoặc đã bị xóa",
       });
     }
 
-    const updated = await Brand.findByIdAndUpdate(id, req.body, { new: true });
+    const updated = await Category.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
     return res.status(200).json({
       success: true,
-      message: "Cập nhật Brand thành công",
-      brand: updated,
+      message: "Cập nhật Category thành công",
+      category: updated,
     });
   } catch (error) {
-    console.error("Lỗi cập nhật Brand", error);
+    console.error("Lỗi cập nhật Category", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
@@ -117,7 +119,7 @@ export const updateBrand = async (req, res) => {
   }
 };
 
-export const deleteBrand = async (req, res) => {
+export const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -126,30 +128,30 @@ export const deleteBrand = async (req, res) => {
       });
     }
 
-    const brandDelete = await Brand.findOne({
+    const brandDelete = await Category.findOne({
       _id: id,
       deletedAt: { $ne: null },
     });
     if (!brandDelete) {
       return res.status(404).json({
         success: false,
-        message: "Brand không tồn tại hoặc chưa bị xóa mềm",
+        message: "Category không tồn tại hoặc chưa bị xóa mềm",
       });
     }
 
-    const data = await Brand.findByIdAndDelete(id);
+    const data = await Category.findByIdAndDelete(id);
     if (!data) {
       return res.status(404).json({
         success: false,
-        message: "Brand không tồn tại",
+        message: "Category không tồn tại",
       });
     }
 
     return res
       .status(200)
-      .json({ success: true, message: "Xóa Brand thành công" });
+      .json({ success: true, message: "Xóa Category thành công" });
   } catch (error) {
-    console.error("Lỗi xóa Brand", error);
+    console.error("Lỗi xóa Category", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
@@ -158,25 +160,28 @@ export const deleteBrand = async (req, res) => {
   }
 };
 
-export const sortDeleteBrand = async (req, res) => {
+export const sortDeleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: "Id Brand không hợp lệ",
+        message: "Id Category không hợp lệ",
       });
     }
 
-    const brandToDelete = await Brand.findOne({ _id: id, deletedAt: null });
-    if (!brandToDelete) {
+    const categoryToDelete = await Category.findOne({
+      _id: id,
+      deletedAt: null,
+    });
+    if (!categoryToDelete) {
       return res.status(404).json({
         success: false,
-        message: "Brand không tồn tại hoặc đã bị xóa mềm",
+        message: "Category không tồn tại hoặc đã bị xóa mềm",
       });
     }
 
-    const sortBrand = await Brand.findByIdAndUpdate(
+    const sortCategory = await Category.findByIdAndUpdate(
       id,
       {
         deletedAt: new Date(),
@@ -186,8 +191,8 @@ export const sortDeleteBrand = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Xóa mềm Brand thành công",
-      brand: sortBrand,
+      message: "Xóa mềm Category thành công",
+      category: sortCategory,
     });
   } catch (error) {
     console.error("Lỗi xóa mềm: ", error);
@@ -199,27 +204,27 @@ export const sortDeleteBrand = async (req, res) => {
   }
 };
 
-export const restoreBrand = async (req, res) => {
+export const restoreCategory = async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
-        message: "Id Brand không hợp lệ",
+        message: "Id Category không hợp lệ",
       });
     }
 
-    const brandToHardDelete = await Brand.findOne({
+    const categoryToHardDelete = await Category.findOne({
       _id: id,
       deletedAt: { $ne: null },
     });
-    if (!brandToHardDelete) {
+    if (!categoryToHardDelete) {
       return res.status(404).json({
         success: false,
-        message: "Brand không tồn tại hoặc chưa xóa mềm",
+        message: "Category không tồn tại hoặc chưa xóa mềm",
       });
     }
 
-    const restoreBrand = await Brand.findByIdAndUpdate(
+    const restoreCategory = await Category.findByIdAndUpdate(
       id,
       { deletedAt: null },
       { new: true }
@@ -227,11 +232,11 @@ export const restoreBrand = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "Khôi phục Brand thành công",
-      brand: restoreBrand,
+      message: "Khôi phục Category thành công",
+      category: restoreCategory,
     });
   } catch (error) {
-    console.error("Lỗi khôi phục Brand:", error);
+    console.error("Lỗi khôi phục Category:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
