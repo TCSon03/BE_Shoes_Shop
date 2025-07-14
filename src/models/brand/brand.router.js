@@ -5,6 +5,7 @@ import {
   deleteBrand,
   getAllBrand,
   getBrandById,
+  getSoftDeletedBrand,
   restoreBrand,
   sortDeleteBrand,
   updateBrand,
@@ -16,6 +17,12 @@ import { authorizeRoles } from "../../common/middlewares/authorization.middlewar
 const brandRouter = Router();
 
 brandRouter.get("/", getAllBrand);
+brandRouter.get(
+  "/get-soft",
+  authenticateToken,
+  authorizeRoles("admin", "superAdmin"),
+  getSoftDeletedBrand
+);
 brandRouter.get("/:id", getBrandById);
 brandRouter.delete(
   "/delete-brand/:id",

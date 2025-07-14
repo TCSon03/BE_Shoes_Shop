@@ -13,8 +13,6 @@ export const createValidation = Joi.object({
   slug: Joi.string().required().messages({
     "string.empty": "Slug không được để trống",
   }),
-  isActive: Joi.boolean().default(true),
-  position: Joi.number().default(0),
 });
 export const updateValidation = Joi.object({
   name: Joi.string().min(3).max(100).required().messages({
@@ -29,6 +27,4 @@ export const updateValidation = Joi.object({
   slug: Joi.string().required().messages({
     "string.empty": "Slug không được để trống",
   }),
-  isActive: Joi.boolean(),
-  position: Joi.number(),
 });

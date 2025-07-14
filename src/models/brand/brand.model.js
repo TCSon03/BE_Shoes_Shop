@@ -20,14 +20,6 @@ const brandSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    position: {
-      type: Number,
-      default: 0,
-    },
     deletedAt: {
       type: Date,
       default: null,
