@@ -54,18 +54,34 @@ export const createProduct = async (req, res) => {
 
 export const getAllProduct = async (req, res) => {
   try {
-    const product = await Product.find({ deletedAt: null });
+    const { page = 1, limit = 5, search = "" } = req.query;
+    const query = {
+      deletedAt: null,
+      name: { $regex: search, $options: "i" },
+    };
+
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .populate("brandId categoryId");
+
     return res.status(200).json({
       success: true,
-      message: "Lấy danh sách Product thành công",
-      product,
+      message: "Lấy danh sách sản phẩm thành công",
+      data: products,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-    console.error("Lỗi lấy Product", error);
+    console.error("Lỗi lấy danh sách sản phẩm:", error);
     return res.status(500).json({
       success: false,
-      message: "Lấy danh sách Product thất bại",
-      error: error.message,
+      message: "Lỗi server",
     });
   }
 };
@@ -285,6 +301,26 @@ export const restoreProduct = async (req, res) => {
       success: false,
       message: "Lỗi server",
       error: error.message,
+    });
+  }
+};
+
+export const getAllDeletedProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ deletedAt: { $ne: null } })
+      .populate("categoryId", "name")
+      .populate("brandId", "name");
+
+    return res.status(200).json({
+      success: true,
+      message: "Lấy danh sách sản phẩm đã xóa mềm thành công",
+      data: products,
+    });
+  } catch (error) {
+    console.error("Lỗi lấy danh sách sản phẩm đã xóa mềm:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
     });
   }
 };

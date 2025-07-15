@@ -36,15 +36,39 @@ export const createCategory = async (req, res) => {
 
 export const getAllCategory = async (req, res) => {
   try {
-    const data = await Category.find({ deletedAt: null });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const search = req.query.search || "";
+    const skip = (page - 1) * limit;
+
+    const searchQuery = search
+      ? { name: { $regex: search, $options: "i" } }
+      : {};
+
+    const query = {
+      ...searchQuery,
+      deletedAt: null,
+    };
+
+    const totalCategories = await Category.countDocuments(query);
+
+    const data = await Category.find(query).skip(skip).limit(limit);
+
+    const totalPages = Math.ceil(totalCategories / limit);
 
     return res.status(200).json({
       success: true,
       message: "Lấy danh sách Category thành công",
       data,
+      pagination: {
+        totalItems: totalCategories,
+        currentPage: page,
+        itemsPerPage: limit,
+        totalPages: totalPages,
+      },
     });
   } catch (error) {
-    console.error("Lỗi lấy danh sách", error);
+    console.error("Lỗi lấy danh sách Brand:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",
@@ -237,6 +261,24 @@ export const restoreCategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Lỗi khôi phục Category:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi server",
+      error: error.message,
+    });
+  }
+};
+
+export const getSoftCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ deletedAt: { $ne: null } });
+    return res.status(200).json({
+      success: true,
+      message: "Lấy danh sách Category đã xóa mềm thành công",
+      categories,
+    });
+  } catch (error) {
+    console.error("Lỗi lấy danh sách Category đã xóa mềm:", error);
     return res.status(500).json({
       success: false,
       message: "Lỗi server",

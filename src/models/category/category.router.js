@@ -7,6 +7,7 @@ import {
   deleteCategory,
   getAllCategory,
   getCategoryById,
+  getSoftCategories,
   restoreCategory,
   sortDeleteCategory,
   updateCategory,
@@ -19,6 +20,12 @@ import {
 const categoryRouter = Router();
 
 categoryRouter.get("/", getAllCategory);
+categoryRouter.get(
+  "/get-soft",
+  authenticateToken,
+  authorizeRoles("admin", "superAdmin"),
+  getSoftCategories
+);
 categoryRouter.get("/:id", getCategoryById);
 categoryRouter.delete(
   "/delete-cate/:id",

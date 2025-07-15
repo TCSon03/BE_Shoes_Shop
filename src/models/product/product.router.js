@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createProduct,
   deleteProduct,
+  getAllDeletedProducts,
   getAllProduct,
   getProductById,
   restoreProduct,
@@ -19,6 +20,7 @@ import { authorizeRoles } from "../../common/middlewares/authorization.middlewar
 const productRouter = Router();
 
 productRouter.get("/", getAllProduct);
+productRouter.get("/get-soft", getAllDeletedProducts);
 productRouter.get("/:id", getProductById);
 productRouter.delete(
   "/delete-pro/:id",

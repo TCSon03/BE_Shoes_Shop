@@ -34,55 +34,27 @@ export const createBrand = async (req, res) => {
   }
 };
 
-// export const getAllBrand = async (req, res) => {
-
-//   try {
-//     const data = await Brand.find({ deletedAt: null });
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "Lấy danh sách Brand thành công",
-//       data,
-//     });
-//   } catch (error) {
-//     console.error("Lỗi lấy danh sách", error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Lỗi server",
-//       error: error.message,
-//     });
-//   }
-// };
-
 export const getAllBrand = async (req, res) => {
   try {
-    // Lấy các tham số từ query string
-    const page = parseInt(req.query.page) || 1; // Trang hiện tại, mặc định là 1
-    const limit = parseInt(req.query.limit) || 5; // Số lượng bản ghi mỗi trang, mặc định là 5
-    const search = req.query.search || ""; // Từ khóa tìm kiếm, mặc định là rỗng
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const search = req.query.search || "";
 
-    // Tính toán số lượng bản ghi cần bỏ qua
     const skip = (page - 1) * limit;
 
-    // Tạo điều kiện tìm kiếm
-    // Tìm kiếm không phân biệt chữ hoa chữ thường trên trường 'name'
     const searchQuery = search
       ? { name: { $regex: search, $options: "i" } }
       : {};
 
-    // Kết hợp điều kiện tìm kiếm với điều kiện deletedAt: null
     const query = {
       ...searchQuery,
       deletedAt: null,
     };
 
-    // Lấy tổng số bản ghi phù hợp với điều kiện tìm kiếm (không phân trang)
     const totalBrands = await Brand.countDocuments(query);
 
-    // Lấy dữ liệu Brand với phân trang và tìm kiếm
     const data = await Brand.find(query).skip(skip).limit(limit);
 
-    // Tính tổng số trang
     const totalPages = Math.ceil(totalBrands / limit);
 
     return res.status(200).json({
