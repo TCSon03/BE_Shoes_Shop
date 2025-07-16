@@ -3,6 +3,7 @@ import {
   createVariant,
   deleteVariant,
   getAllVariant,
+  getAllVariantProduct,
   getVariantById,
   updateVariant,
 } from "./variant.controller.js";
@@ -17,7 +18,8 @@ import { authorizeRoles } from "../../common/middlewares/authorization.middlewar
 const variantRouter = Router();
 
 variantRouter.get("/get-all-var", getAllVariant);
-variantRouter.get("/variants/:id", getVariantById);
+variantRouter.get("/get-by-name", getAllVariantProduct);
+variantRouter.get("/get-detail/:id", getVariantById);
 variantRouter.delete(
   "/delete-var/:id",
   authenticateToken,
