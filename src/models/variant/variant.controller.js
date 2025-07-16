@@ -1,31 +1,25 @@
 import mongoose from "mongoose";
 import Product from "../product/product.model.js";
 import Variant from "./variant.model.js";
+import { updateVariantValidation } from "./variant.validation.js";
 
 export const createVariant = async (req, res) => {
   try {
-    const { productId } = req.params;
-    const { color, size, price, stock, image } = req.body;
+    const { productId, color, size, price, stock, image } = req.body;
 
-    if (!productId || !productId.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(400).json({
-        message: "productId không hợp lệ",
-      });
+    const trimmedProductId = productId.trim();
+    if (!trimmedProductId.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: "productId không hợp lệ" });
     }
 
     const existingProduct = await Product.findById(productId);
     if (!existingProduct) {
       return res.status(404).json({
-        message: "Product không tồn tại",
+        message: "Sản phẩm không tồn tại",
       });
     }
 
-    const isExist = await Variant.findOne({
-      productId,
-      size,
-      color,
-    });
-
+    const isExist = await Variant.findOne({ productId, size, color });
     if (isExist) {
       return res.status(409).json({
         message: `Biến thể màu "${color}" và size ${size} đã tồn tại cho sản phẩm này`,
@@ -58,36 +52,52 @@ export const createVariant = async (req, res) => {
 
 export const getAllVariant = async (req, res) => {
   try {
-    const { productId } = req.params;
+    const { page = 1, limit = 5, search = "", sortPrice = "" } = req.query;
 
-    if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({
-        success: false,
-        message: "productId không hợp lệ",
-      });
+    const searchRegex = new RegExp(search, "i");
+    const query = {
+      $or: [
+        { color: { $regex: searchRegex } },
+        { size: isNaN(Number(search)) ? undefined : Number(search) },
+      ],
+    };
+
+    // Xoá undefined nếu không có số
+    if (query.$or[1].size === undefined) {
+      query.$or.pop();
     }
 
-    const product = await Product.findById(productId);
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Sản phẩm không tồn tại",
-      });
+    // Xử lý sắp xếp giá: "asc" (tăng dần) hoặc "desc" (giảm dần)
+    let sortOption = {};
+    if (sortPrice === "asc") {
+      sortOption.price = 1;
+    } else if (sortPrice === "desc") {
+      sortOption.price = -1;
     }
 
-    const variants = await Variant.find({ productId });
+    const total = await Variant.countDocuments(query);
+    const variants = await Variant.find(query)
+      .sort(sortOption) // áp dụng sắp xếp
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .populate("productId", "name");
 
     return res.status(200).json({
       success: true,
-      message: "Lấy danh sách biến thể thành công",
+      message: "Lấy danh sách biến thể sản phẩm thành công",
       data: variants,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-    console.error("Lỗi khi lấy danh sách biến thể:", error);
+    console.error("Lỗi lấy danh sách biến thể sản phẩm:", error);
     return res.status(500).json({
       success: false,
-      message: "Lỗi server khi lấy danh sách biến thể",
-      error: error.message,
+      message: "Lỗi server",
     });
   }
 };
@@ -165,8 +175,8 @@ export const deleteVariant = async (req, res) => {
 export const updateVariant = async (req, res) => {
   try {
     const { id } = req.params;
-    const { color, size, price, stock, image } = req.body;
 
+    // ✅ Kiểm tra ID hợp lệ
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
@@ -174,45 +184,65 @@ export const updateVariant = async (req, res) => {
       });
     }
 
-    const existingVariant = await Variant.findById(id);
-    if (!existingVariant) {
-      return res.status(404).json({
-        success: false,
-        message: "Biến thể không tồn tại",
-      });
-    }
-
-    const normalizedColor = color?.trim().toLowerCase();
-
-    const isDuplicate = await Variant.findOne({
-      _id: { $ne: id }, 
-      productId: existingVariant.productId,
-      color: normalizedColor || existingVariant.color,
-      size: size ?? existingVariant.size,
+    // ✅ Validate dữ liệu đầu vào bằng Joi
+    const validatedData = await updateVariantValidation.validateAsync(req.body, {
+      abortEarly: false,
+      stripUnknown: true,
     });
 
-    if (isDuplicate) {
-      return res.status(409).json({
+    const { color, size, price, stock, image } = validatedData;
+
+    // ✅ Tìm biến thể theo ID
+    const variant = await Variant.findById(id);
+    if (!variant) {
+      return res.status(404).json({
         success: false,
-        message: `Biến thể màu "${normalizedColor}" và size ${size} đã tồn tại cho sản phẩm này`,
+        message: "Không tìm thấy biến thể",
       });
     }
 
-    existingVariant.color = normalizedColor || existingVariant.color;
-    existingVariant.size = size ?? existingVariant.size;
-    existingVariant.price = price ?? existingVariant.price;
-    existingVariant.stock = stock ?? existingVariant.stock;
-    existingVariant.image = image || existingVariant.image;
+    // ✅ Kiểm tra trùng lặp với biến thể khác (cùng productId, color, size)
+    const duplicate = await Variant.findOne({
+      _id: { $ne: id }, // loại chính nó ra
+      productId: variant.productId,
+      color,
+      size,
+    });
 
-    await existingVariant.save();
+    if (duplicate) {
+      return res.status(409).json({
+        success: false,
+        message: `Biến thể với màu "${color}" và size ${size} đã tồn tại cho sản phẩm này`,
+      });
+    }
+
+    // ✅ Cập nhật biến thể
+    variant.color = color;
+    variant.size = size;
+    variant.price = price;
+    variant.stock = stock ?? 0;
+    variant.image = image || variant.image;
+
+    // ✅ Lưu lại vào database
+    await variant.save();
 
     return res.status(200).json({
       success: true,
       message: "Cập nhật biến thể thành công",
-      data: existingVariant,
+      data: variant,
     });
   } catch (error) {
     console.error("Lỗi cập nhật biến thể:", error);
+
+    // Nếu là lỗi từ Joi
+    if (error.isJoi) {
+      return res.status(400).json({
+        success: false,
+        message: "Dữ liệu không hợp lệ",
+        errors: error.details.map((e) => e.message),
+      });
+    }
+
     return res.status(500).json({
       success: false,
       message: "Lỗi server khi cập nhật biến thể",
@@ -220,3 +250,4 @@ export const updateVariant = async (req, res) => {
     });
   }
 };
+

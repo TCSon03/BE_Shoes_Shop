@@ -12,7 +12,7 @@ router.use("/auth", authRouter);
 router.use("/brand", brandRouter);
 router.use("/cate", categoryRouter);
 router.use("/products", productRouter);
-router.use("/products", variantRouter);
+router.use("/variants", variantRouter);
 router.use("/cart", cartRouter);
 
 export default router;
