@@ -5,6 +5,7 @@ import categoryRouter from "../models/category/category.router.js";
 import productRouter from "../models/product/product.router.js";
 import variantRouter from "../models/variant/variant.router.js";
 import cartRouter from "../models/cart/cart.router.js";
+import orderRouter from "../models/order/order.router.js";
 
 const router = Router();
 
@@ -14,5 +15,6 @@ router.use("/cate", categoryRouter);
 router.use("/products", productRouter);
 router.use("/variants", variantRouter);
 router.use("/cart", cartRouter);
+router.use("/orders", orderRouter);
 
 export default router;
