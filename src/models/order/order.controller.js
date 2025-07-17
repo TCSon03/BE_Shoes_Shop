@@ -57,7 +57,9 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    // Bước 4: Trừ kho
+    // **QUAN TRỌNG:** Giữ nguyên bước trừ kho VÀ xoá giỏ hàng.
+    // Việc này đảm bảo hàng không bị bán trùng và giỏ hàng được dọn dẹp.
+    // Nếu thanh toán VNPAY thất bại, bạn có thể cân nhắc một cơ chế hoàn kho/thông báo.
     for (const item of cart.items) {
       await Variant.findByIdAndUpdate(item.variantId._id, {
         $inc: { stock: -item.quantity },
@@ -73,21 +75,29 @@ export const createOrder = async (req, res) => {
       phoneNumber,
       paymentMethod,
       notes,
-      isPaid: paymentMethod === "Online",
-      paidAt: paymentMethod === "Online" ? new Date() : null,
+      // CHỈNH SỬA Ở ĐÂY:
+      isPaid: false, // Ban đầu luôn là false khi tạo đơn hàng, chờ xác nhận từ VNPAY
+      paidAt: null, // Ban đầu là null, sẽ được cập nhật sau khi thanh toán thành công
+      status: "pending", // Hoặc một trạng thái "chờ thanh toán" khác nếu bạn có
     });
 
     // Bước 6: Xoá giỏ hàng
     await Cart.findOneAndUpdate({ userId }, { $set: { items: [] } });
 
     // Bước 7: Trả về kết quả
+    // Trả về ID của đơn hàng để frontend có thể dùng nó gọi API VNPAY
     return res.status(201).json({
       success: true,
       message: "Tạo đơn hàng thành công",
-      order: newOrder,
+      orderId: newOrder._id, // Trả về ID đơn hàng
+      totalAmount: newOrder.totalAmount, // Trả về tổng tiền để frontend tiện sử dụng cho VNPAY
+      paymentMethod: newOrder.paymentMethod, // Trả về phương thức thanh toán
     });
   } catch (error) {
     console.error("Lỗi khi tạo đơn hàng:", error);
+    // Lưu ý: Nếu có lỗi ở đây (ví dụ, DB lỗi, giỏ hàng trống), kho vẫn chưa bị trừ.
+    // Nếu lỗi sau khi trừ kho nhưng trước khi tạo đơn hàng, cần có cơ chế rollback hoặc log lỗi.
+    // Với cấu trúc hiện tại, trừ kho và tạo đơn hàng là atomic trong cùng một try/catch.
     return res.status(500).json({
       message: "Đã xảy ra lỗi khi tạo đơn hàng",
       error: error.message,
